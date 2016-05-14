@@ -1,6 +1,6 @@
 tools:
     external_code_coverage:
-        timeout: 1500 #15 min
+        timeout: 600
 filter:
     paths:
         - src/*

@@ -1,11 +1,11 @@
 <?php
-namespace Goetas\Xsd\XsdToPhpRuntime\Jms\Handler;
+namespace GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler;
 
-use JMS\Serializer\Handler\SubscribingHandlerInterface;
-use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Context;
-use JMS\Serializer\XmlSerializationVisitor;
+use JMS\Serializer\GraphNavigator;
+use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\XmlDeserializationVisitor;
+use JMS\Serializer\XmlSerializationVisitor;
 
 class BaseTypesHandler implements SubscribingHandlerInterface
 {
@@ -37,7 +37,7 @@ class BaseTypesHandler implements SubscribingHandlerInterface
         );
 
         $ret = array();
-        foreach ($object as $v){
+        foreach ($object as $v) {
             $ret[] = $context->accept($v, $newType)->data;
         }
 
@@ -51,7 +51,7 @@ class BaseTypesHandler implements SubscribingHandlerInterface
             'params' => array()
         );
         $ret = array();
-        foreach (explode(" ", (string)$node) as $v){
+        foreach (explode(" ", (string)$node) as $v) {
             $ret[] = $context->accept($v, $newType);
         }
         return $ret;
