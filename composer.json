@@ -1,0 +1,44 @@
+{
+    "name":"goetas/xsd2php-runtime",
+    "description":"Convert XSD  (XML Schema) definitions into PHP classes",
+    "type":"library",
+    "authors":[
+        {
+            "name":"Asmir Mustafic"
+        }
+    ],
+    "keywords":[
+        "converter",
+        "xml",
+        "xsd",
+        "php",
+        "jms",
+        "serializer"
+    ],
+    "license":"LGPL",
+    "require":{
+        "php":">=5.5",
+        "jms/serializer":"serializer-master-dev as 1.0"
+    },
+    "repositories":[
+        {
+            "type":"vcs",
+            "url":"https://github.com/goetas/serializer.git"
+        }
+    ],
+    "autoload":{
+        "psr-4":{
+            "Goetas\\Xsd\\XsdToPhpRuntime\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Goetas\\Xsd\\XsdToPhpRuntime\\Tests\\":"tests/"
+        }
+    },
+    "extra":{
+        "branch-alias":{
+            "dev-master":"0.1-dev"
+        }
+    }
+}
