@@ -16,13 +16,13 @@ class BaseTypesHandler implements SubscribingHandlerInterface
             array(
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\Jms\SimpleListOf',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf',
                 'method' => 'simpleListOfToXml'
             ),
             array(
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\Jms\SimpleListOf',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\Jms\SimpleListOf',
                 'method' => 'simpleListOfFromXML'
             )
         );

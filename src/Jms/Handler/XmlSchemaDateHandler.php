@@ -19,25 +19,25 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
             array(
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\XMLSchema\DateTime',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime',
                 'method' => 'deserializeDateTime'
             ),
             array(
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\XMLSchema\DateTime',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime',
                 'method' => 'serializeDateTime'
             ),
             array(
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\XMLSchema\Time',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Time',
                 'method' => 'deserializeTime'
             ),
             array(
                 'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
                 'format' => 'xml',
-                'type' => 'Goetas\Xsd\XsdToPhp\XMLSchema\Time',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Time',
                 'method' => 'serializeTime'
             )
         );
