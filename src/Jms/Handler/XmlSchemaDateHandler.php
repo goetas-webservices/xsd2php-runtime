@@ -39,7 +39,13 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
                 'format' => 'xml',
                 'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Time',
                 'method' => 'serializeTime'
-            )
+            ),
+            array(
+                'type' => 'DateInterval',
+                'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
+                'format' => 'xml',
+                'method' => 'deserializeDateIntervalXml',
+            ),
         );
     }
 
@@ -47,6 +53,14 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
     {
         $this->defaultTimezone = new \DateTimeZone($defaultTimezone);
 
+    }
+
+    public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type){
+        $attributes = $data->attributes('xsi', true);
+        if (isset($attributes['nil'][0]) && (string) $attributes['nil'][0] === 'true') {
+            return null;
+        }
+        return new \DateInterval((string)$data);
     }
 
     public function serializeDateTime(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
