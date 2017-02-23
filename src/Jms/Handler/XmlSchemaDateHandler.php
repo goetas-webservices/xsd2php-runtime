@@ -67,9 +67,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
     {
 
         $v = $date->format(\DateTime::W3C);
-        if (substr($v, -5) == "00:00") {
-            $v = substr($v, 0, -6);
-        }
+
         return $visitor->visitSimpleString($v, $type, $context);
     }
 
