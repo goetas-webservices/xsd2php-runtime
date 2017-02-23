@@ -58,11 +58,11 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
     public function getSerializeDateTime()
     {
         return [
-            [new \DateTime('2015-01-01 12:00'), '2015-01-01T12:00:00'],
-            [new \DateTime('2015-01-01 12:00:56'), '2015-01-01T12:00:56'],
-            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56'],
+            [new \DateTime('2015-01-01 12:00+00:00'), '2015-01-01T12:00:00+00:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56+00:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56+20:00'), '2015-01-01T12:00:56+20:00'],
-            [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56'],
+            [new \DateTime('2015-01-01 12:00:56+00:00', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56+00:00'],
         ];
     }
 }
