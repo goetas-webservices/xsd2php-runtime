@@ -89,6 +89,9 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         if (isset($attributes['nil'][0]) && (string)$attributes['nil'][0] === 'true') {
             return null;
         }
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(Z|([+-]\d{2}:\d{2}))?$/', $data)) {
+            throw new RuntimeException(sprintf('Invalid date "%s", expected valid XML Schema date string.', $data));
+        }
 
         return $this->parseDateTime($data, $type);
     }

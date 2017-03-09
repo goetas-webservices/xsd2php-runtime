@@ -64,4 +64,13 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
             ['2015-01-01-20:00', new \DateTime('2015-01-01', new \DateTimeZone("-20:00"))],
         ];
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testDeserializeInvalidDate()
+    {
+        $element = new \SimpleXMLElement("<Date>2015-01-01T</Date>");
+        $this->handler->deserializeDate($this->visitor, $element, [], $this->context);
+    }
 }
