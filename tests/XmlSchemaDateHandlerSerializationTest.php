@@ -65,4 +65,26 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56'],
         ];
     }
+
+    /**
+     * @dataProvider getSerializeDate
+     * @param \DateTime $date
+     * @param string    $expected
+     */
+    public function testSerializeDate(\DateTime $date, $expected)
+    {
+        $this->handler->serializeDate($this->visitor, $date, [], $this->context);
+        $this->assertEquals($expected, $this->visitor->getCurrentNode()->nodeValue);
+    }
+
+    public function getSerializeDate()
+    {
+        return [
+            [new \DateTime('2015-01-01 12:00'), '2015-01-01'],
+            [new \DateTime('2015-01-01 12:00:56'), '2015-01-01'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01'],
+            [new \DateTime('2015-01-01 12:00:56+20:00'), '2015-01-01'],
+            [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01'],
+        ];
+    }
 }

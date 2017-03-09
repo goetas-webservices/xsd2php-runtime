@@ -19,6 +19,18 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
             array(
                 'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
                 'format' => 'xml',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date',
+                'method' => 'deserializeDate'
+            ),
+            array(
+                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
+                'format' => 'xml',
+                'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\Date',
+                'method' => 'serializeDate'
+            ),
+            array(
+                'direction' => GraphNavigator::DIRECTION_DESERIALIZATION,
+                'format' => 'xml',
                 'type' => 'GoetasWebservices\Xsd\XsdToPhp\XMLSchema\DateTime',
                 'method' => 'deserializeDateTime'
             ),
@@ -61,6 +73,27 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
             return null;
         }
         return new \DateInterval((string)$data);
+    }
+
+    public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
+    {
+
+        $v = $date->format('Y-m-d');
+
+        return $visitor->visitSimpleString($v, $type, $context);
+    }
+
+    public function deserializeDate(XmlDeserializationVisitor $visitor, $data, array $type)
+    {
+        $attributes = $data->attributes('xsi', true);
+        if (isset($attributes['nil'][0]) && (string)$attributes['nil'][0] === 'true') {
+            return null;
+        }
+        if (!preg_match('/^(\d{4})-(\d{2})-(\d{2})(Z|([+-]\d{2}:\d{2}))?$/', $data)) {
+            throw new RuntimeException(sprintf('Invalid date "%s", expected valid XML Schema date string.', $data));
+        }
+
+        return $this->parseDateTime($data, $type);
     }
 
     public function serializeDateTime(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
