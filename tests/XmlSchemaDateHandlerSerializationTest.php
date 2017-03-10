@@ -62,6 +62,7 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
             [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56+20:00'), '2015-01-01T12:00:56+20:00'],
+            [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56+00:00', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/Rome")), '2015-01-01T12:00:56+01:00'],
         ];
