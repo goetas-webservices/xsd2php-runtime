@@ -15,7 +15,7 @@
     "jms",
     "serializer"
   ],
-  "license": "LGPL",
+  "license": "LGPL-3.0-or-later",
   "require": {
     "php": ">=5.5",
     "jms/serializer": "^1.2",
