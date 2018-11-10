@@ -6,3 +6,12 @@
 
 
 Runtime libs for https://github.com/goetas-webservices/xsd2php
+
+## Note 
+
+The code in this project is provided under the 
+[MIT](https://opensource.org/licenses/MIT) license. 
+For professional support 
+contact [goetas@gmail.com](mailto:goetas@gmail.com) 
+or visit [https://www.goetas.com](https://www.goetas.com)
+
