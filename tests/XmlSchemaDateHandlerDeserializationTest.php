@@ -3,13 +3,16 @@ namespace GoetasWebservices\Xsd\XsdToPhpRuntime\Tests\Jms\Handler;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
+use JMS\Serializer\Accessor\DefaultAccessorStrategy;
 use JMS\Serializer\Construction\UnserializeObjectConstructor;
+use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\HandlerRegistry;
 use JMS\Serializer\Metadata\Driver\AnnotationDriver;
 use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\XmlDeserializationVisitor;
+use JMS\Serializer\XmlSerializationVisitor;
 use Metadata\MetadataFactory;
 
 class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +22,7 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
      */
     protected $handler;
     /**
-     * @var SerializationContext
+     * @var DeserializationContext
      */
     protected $context;
 
@@ -31,16 +34,35 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
     public function setUp()
     {
         $this->handler = new XmlSchemaDateHandler();
-        $this->visitor = new XmlDeserializationVisitor(new IdenticalPropertyNamingStrategy());
+        $this->context = DeserializationContext::create();
+        $naming = new IdenticalPropertyNamingStrategy();
+
+
 
         $dispatcher = new EventDispatcher();
         $handlerRegistry= new HandlerRegistry();
-        $objectConstructor = new UnserializeObjectConstructor();
-        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader()));
+        $cons = new UnserializeObjectConstructor();
 
-        $navigator = new GraphNavigator($metadataFactory, $handlerRegistry, $objectConstructor, $dispatcher);
-
+        $navigator = class_exists('JMS\Serializer\GraphNavigator\DeserializationGraphNavigator')
+            ? $this->initJmsv2($naming, $handlerRegistry, $cons, $dispatcher)
+            : $this->initJmsv1($naming, $handlerRegistry, $cons, $dispatcher)
+        ;
         $this->visitor->setNavigator($navigator);
+    }
+
+    private function initJmsv2($naming, $handlerRegistry, $cons, $dispatcher)
+    {
+        $accessor = new DefaultAccessorStrategy();
+        $this->visitor = new XmlDeserializationVisitor();
+        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader(), $naming));
+        return new GraphNavigator\DeserializationGraphNavigator($metadataFactory, $handlerRegistry, $cons, $accessor, $dispatcher);
+    }
+
+    private function initJmsv1($naming, $handlerRegistry, $cons, $dispatcher)
+    {
+        $this->visitor = new XmlDeserializationVisitor($naming);
+        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader()));
+        return new GraphNavigator($metadataFactory, $handlerRegistry, $cons, $dispatcher);
     }
 
     /**

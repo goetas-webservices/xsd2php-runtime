@@ -3,6 +3,7 @@ namespace GoetasWebservices\Xsd\XsdToPhpRuntime\Tests\Jms\Handler;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler\XmlSchemaDateHandler;
+use JMS\Serializer\Accessor\DefaultAccessorStrategy;
 use JMS\Serializer\Construction\UnserializeObjectConstructor;
 use JMS\Serializer\EventDispatcher\EventDispatcher;
 use JMS\Serializer\GraphNavigator;
@@ -33,16 +34,33 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
     {
         $this->handler = new XmlSchemaDateHandler();
         $this->context = SerializationContext::create();
-        $this->visitor = new XmlSerializationVisitor(new IdenticalPropertyNamingStrategy());
+
+        $naming = new IdenticalPropertyNamingStrategy();
+        $cons = new UnserializeObjectConstructor();
 
         $dispatcher = new EventDispatcher();
         $handlerRegistry= new HandlerRegistry();
-        $objectConstructor = new UnserializeObjectConstructor();
-        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader()));
 
-        $navigator = new GraphNavigator($metadataFactory, $handlerRegistry, $objectConstructor, $dispatcher);
-
+        $navigator = class_exists('JMS\Serializer\GraphNavigator\DeserializationGraphNavigator')
+            ? $this->initJmsv2($naming, $handlerRegistry, $cons, $dispatcher)
+            : $this->initJmsv1($naming, $handlerRegistry, $cons, $dispatcher)
+        ;
         $this->visitor->setNavigator($navigator);
+    }
+
+    private function initJmsv2($naming, $handlerRegistry, $cons, $dispatcher)
+    {
+        $accessor = new DefaultAccessorStrategy();
+        $this->visitor = new XmlSerializationVisitor();
+        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader(), $naming));
+        return new GraphNavigator\SerializationGraphNavigator($metadataFactory, $handlerRegistry, $accessor, $dispatcher);
+    }
+
+    private function initJmsv1($naming, $handlerRegistry, $cons, $dispatcher)
+    {
+        $this->visitor = new XmlSerializationVisitor($naming);
+        $metadataFactory = new MetadataFactory(new AnnotationDriver(new AnnotationReader()));
+        return new GraphNavigator($metadataFactory, $handlerRegistry, $cons, $dispatcher);
     }
 
     /**
@@ -51,8 +69,9 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerializeDateTime(\DateTime $date, $expected)
     {
-        $this->handler->serializeDateTime($this->visitor, $date, [], $this->context);
-        $this->assertEquals($expected, $this->visitor->getCurrentNode()->nodeValue);
+        $ret = $this->handler->serializeDateTime($this->visitor, $date, [], $this->context);
+        $actual = $ret ? $ret->nodeValue : $this->visitor->getCurrentNode()->nodeValue;
+        $this->assertEquals($expected, $actual);
     }
 
     public function getSerializeDateTime()
@@ -75,8 +94,10 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
      */
     public function testSerializeDate(\DateTime $date, $expected)
     {
-        $this->handler->serializeDate($this->visitor, $date, [], $this->context);
-        $this->assertEquals($expected, $this->visitor->getCurrentNode()->nodeValue);
+        $ret = $this->handler->serializeDate($this->visitor, $date, [], $this->context);
+
+        $actual = $ret ? $ret->nodeValue : $this->visitor->getCurrentNode()->nodeValue;
+        $this->assertEquals($expected, $actual);
     }
 
     public function getSerializeDate()
