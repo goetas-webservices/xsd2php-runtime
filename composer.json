@@ -25,6 +25,7 @@
     "jms/serializer": "1.4.1|1.6.1|1.6.2"
   },  
   "require-dev": {
+    "ext-simplexml": "*",
     "phpunit/phpunit": "^4.8|^5.0"
   },
   "autoload": {

@@ -12,6 +12,8 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 {
 
     protected $defaultTimezone;
+    protected $serializeTimezone;
+    protected $deserializeTimezone;
 
     public static function getSubscribingMethods()
     {
@@ -61,10 +63,17 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         );
     }
 
-    public function __construct($defaultTimezone = 'UTC')
+    /**
+     * @param string $defaultTimezone default timezone if timezone is absent in deserialized string
+     * @param null $serializeTimezone timezone of serialized date/datetime/time. Works properly since php 7.0
+     * @param null $deserializeTimezone timezone of deserialized date/datetime/time. Works properly since php 7.0
+     *                                  note that $defaultTimezone may be applied first
+     */
+    public function __construct($defaultTimezone = 'UTC', $serializeTimezone = null, $deserializeTimezone = null)
     {
         $this->defaultTimezone = new \DateTimeZone($defaultTimezone);
-
+        $this->serializeTimezone = $serializeTimezone ? new \DateTimeZone($serializeTimezone) : null;
+        $this->deserializeTimezone = $deserializeTimezone ? new \DateTimeZone($deserializeTimezone) : null;
     }
 
     public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type){
@@ -77,7 +86,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
     {
-
+        $date = $this->prepareDateTimeBeforeSerialize($date);
         $v = $date->format('Y-m-d');
 
         return $visitor->visitSimpleString($v, $type, $context);
@@ -98,7 +107,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     public function serializeDateTime(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
     {
-
+        $date = $this->prepareDateTimeBeforeSerialize($date);
         $v = $date->format(\DateTime::W3C);
 
         return $visitor->visitSimpleString($v, $type, $context);
@@ -117,6 +126,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     public function serializeTime(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
     {
+        $date = $this->prepareDateTimeBeforeSerialize($date);
         $v = $date->format('H:i:s');
         if ($date->getTimezone()->getOffset($date) !== $this->defaultTimezone->getOffset($date)) {
             $v .= $date->format('P');
@@ -129,6 +139,10 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         $attributes = $data->attributes('xsi', true);
         if (isset($attributes['nil'][0]) && (string)$attributes['nil'][0] === 'true') {
             return null;
+        }
+
+        if ($this->deserializeTimezone) {
+            return $this->parseDateTime($data, $type);
         }
 
         $data = (string)$data;
@@ -144,7 +158,22 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
             throw new RuntimeException(sprintf('Invalid datetime "%s", expected valid XML Schema dateTime string.', $data));
         }
 
+        if ($this->deserializeTimezone) {
+            $datetime->setTimezone($this->deserializeTimezone);
+        }
+
         return $datetime;
+    }
+
+    private function prepareDateTimeBeforeSerialize(\DateTime $date)
+    {
+        if ($this->serializeTimezone) {
+            $dateCopy = clone $date;
+            $dateCopy->setTimezone($this->serializeTimezone);
+            return $dateCopy;
+        }
+
+        return $date;
     }
 }
 

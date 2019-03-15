@@ -66,6 +66,7 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getSerializeDateTime
      * @param \DateTime $date
+     * @param string $expected
      */
     public function testSerializeDateTime(\DateTime $date, $expected)
     {
@@ -84,6 +85,43 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56+00:00', new \DateTimeZone("Europe/London")), '2015-01-01T12:00:56+00:00'],
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/Rome")), '2015-01-01T12:00:56+01:00'],
+        ];
+    }
+
+    /**
+     * @requires PHP 7.0
+     * @dataProvider getSerializeDateTimeWithTimezone
+     * @param \DateTime $date
+     * @param string $expected
+     * @param string $defaultTimezone
+     * @param string $serializeTimezone
+     * @param string $deserializeTimezone
+     */
+    public function testSerializeDateTimeWithTimezone(
+        \DateTime $date,
+        $expected,
+        $defaultTimezone = 'UTC',
+        $serializeTimezone = null,
+        $deserializeTimezone = null
+    ) {
+        $handler = new XmlSchemaDateHandler($defaultTimezone, $serializeTimezone, $deserializeTimezone);
+        $ret = $handler->serializeDateTime($this->visitor, $date, [], $this->context);
+        $actual = $ret ? $ret->nodeValue : $this->visitor->getCurrentNode()->nodeValue;
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function getSerializeDateTimeWithTimezone()
+    {
+        return [
+            // serialize timezone is set (here we expect timezone shifting to required one)
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T12:00:56+00:00', 'UTC', 'Z'],
+            [new \DateTime('2015-01-01 12:00:56+02:00'), '2015-01-01T10:00:56+00:00', 'UTC', 'Z'],
+            [new \DateTime('2015-01-01 12:00:56+06:00'), '2015-01-01T06:00:56+00:00', 'UTC', '+00:00'],
+            [new \DateTime('2015-01-01 12:00:56+06:00'), '2015-01-01T12:00:56+06:00', 'UTC', '+06:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T18:00:56+06:00', 'UTC', '+06:00'],
+            [new \DateTime('2015-01-01 12:00:56+12:00'), '2015-01-01T06:00:56+06:00', 'UTC', '+06:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01T06:00:56-06:00', 'UTC', '-06:00'],
+            [new \DateTime('2015-01-01 12:00:56-12:00'), '2015-01-01T18:00:56-06:00', 'UTC', '-06:00'],
         ];
     }
 
@@ -108,6 +146,42 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
             [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01'],
             [new \DateTime('2015-01-01 12:00:56+20:00'), '2015-01-01'],
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01'],
+        ];
+    }
+
+    /**
+     * @requires PHP 7.0
+     * @dataProvider getSerializeDateWithTimezone
+     * @param \DateTime $date
+     * @param string $expected
+     * @param string $defaultTimezone
+     * @param string $serializeTimezone
+     * @param string $deserializeTimezone
+     */
+    public function testSerializeDateWithTimezone(
+        \DateTime $date,
+        $expected,
+        $defaultTimezone = 'UTC',
+        $serializeTimezone = null,
+        $deserializeTimezone = null
+    ) {
+        $handler = new XmlSchemaDateHandler($defaultTimezone, $serializeTimezone, $deserializeTimezone);
+        $ret = $handler->serializeDate($this->visitor, $date, [], $this->context);
+        $actual = $ret ? $ret->nodeValue : $this->visitor->getCurrentNode()->nodeValue;
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function getSerializeDateWithTimezone()
+    {
+        return [
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01', 'UTC', 'Z'],
+            [new \DateTime('2015-01-01 12:00:56+02:00'), '2015-01-01', 'UTC', 'Z'],
+            [new \DateTime('2015-01-01 12:00:56-02:00'), '2015-01-01', 'UTC', 'Z'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-01', 'UTC', '+06:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-02', 'UTC', '+12:00'],
+            [new \DateTime('2015-01-01 11:00:50+00:00'), '2014-12-31', 'UTC', '-12:00'],
+            [new \DateTime('2015-01-01 12:00:56+06:00'), '2015-01-01', 'UTC', '+06:00'],
+            [new \DateTime('2015-01-01 12:00:56+00:00'), '2015-01-02', 'UTC', '+25:00'],
         ];
     }
 }
