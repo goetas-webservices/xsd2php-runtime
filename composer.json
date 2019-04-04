@@ -1,5 +1,5 @@
 {
-  "name": "goetas-webservices/xsd2php-runtime",
+  "name": "lucasthecure/xsd2php-runtime",
   "description": "Convert XSD  (XML Schema) definitions into PHP classes",
   "type": "library",
   "authors": [
@@ -42,5 +42,8 @@
     "branch-alias": {
       "dev-master": "0.2-dev"
     }
+  },
+  "replace": {
+    "goetas-webservices/xsd2php-runtime": "self.version"
   }
 }
