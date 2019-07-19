@@ -1,4 +1,5 @@
 <?php
+
 namespace GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler;
 
 use JMS\Serializer\Context;
@@ -67,12 +68,21 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     }
 
-    public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type){
+    public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type)
+    {
         $attributes = $data->attributes('xsi', true);
-        if (isset($attributes['nil'][0]) && (string) $attributes['nil'][0] === 'true') {
+        if (isset($attributes['nil'][0]) && (string)$attributes['nil'][0] === 'true') {
             return null;
         }
-        return new \DateInterval((string)$data);
+
+        //Accept negative intervals like -PT1M23S.  Safe to assume that "-" doesn't exist elsewhere in a valid interval spec.
+        $interval = str_replace('-', '', (string)$data, $count);
+        $dateInterval = new \DateInterval($interval);
+
+        //Invert if a negative sign was found
+        $dateInterval->invert = !!$count;
+
+        return $dateInterval;
     }
 
     public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
