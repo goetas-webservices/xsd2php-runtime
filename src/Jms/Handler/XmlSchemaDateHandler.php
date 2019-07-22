@@ -1,5 +1,4 @@
 <?php
-
 namespace GoetasWebservices\Xsd\XsdToPhpRuntime\Jms\Handler;
 
 use JMS\Serializer\Context;
@@ -59,6 +58,12 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
                 'format' => 'xml',
                 'method' => 'deserializeDateIntervalXml',
             ),
+            array(
+                'type' => 'DateInterval',
+                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
+                'format' => 'xml',
+                'method' => 'serializeDateInterval',
+            ),
         );
     }
 
@@ -68,10 +73,9 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     }
 
-    public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type)
-    {
+    public function deserializeDateIntervalXml(XmlDeserializationVisitor $visitor, $data, array $type){
         $attributes = $data->attributes('xsi', true);
-        if (isset($attributes['nil'][0]) && (string)$attributes['nil'][0] === 'true') {
+        if (isset($attributes['nil'][0]) && (string) $attributes['nil'][0] === 'true') {
             return null;
         }
 
@@ -85,9 +89,39 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         return $dateInterval;
     }
 
+    public function serializeDateInterval(XmlSerializationVisitor $visitor, \DateInterval $interval, array $type, Context $context)
+    {
+        $date = array_filter(array(
+            'Y' => $interval->y,
+            'M' => $interval->m,
+            'D' => $interval->d
+        ));
+
+        // Reading all non-zero time parts.
+        $time = array_filter(array(
+            'H' => $interval->h,
+            'M' => $interval->i,
+            'S' => $interval->s
+        ));
+
+        $specString = 'P';
+
+        // Adding each part to the spec-string.
+        foreach ($date as $key => $value) {
+            $specString .= $value . $key;
+        }
+        if (count($time) > 0) {
+            $specString .= 'T';
+            foreach ($time as $key => $value) {
+                $specString .= $value . $key;
+            }
+        }
+
+        return $visitor->visitSimpleString($specString, $type, $context);
+    }
+
     public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
     {
-
         $v = $date->format('Y-m-d');
 
         return $visitor->visitSimpleString($v, $type, $context);
