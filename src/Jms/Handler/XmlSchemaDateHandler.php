@@ -58,6 +58,12 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
                 'format' => 'xml',
                 'method' => 'deserializeDateIntervalXml',
             ),
+            array(
+                'type' => 'DateInterval',
+                'direction' => GraphNavigator::DIRECTION_SERIALIZATION,
+                'format' => 'xml',
+                'method' => 'serializeDateInterval',
+            ),
         );
     }
 
@@ -72,12 +78,50 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         if (isset($attributes['nil'][0]) && (string) $attributes['nil'][0] === 'true') {
             return null;
         }
-        return new \DateInterval((string)$data);
+
+        //Accept negative intervals like -PT1M23S.  Safe to assume that "-" doesn't exist elsewhere in a valid interval spec.
+        $interval = str_replace('-', '', (string)$data, $count);
+        $dateInterval = new \DateInterval($interval);
+
+        //Invert if a negative sign was found
+        $dateInterval->invert = !!$count;
+
+        return $dateInterval;
+    }
+
+    public function serializeDateInterval(XmlSerializationVisitor $visitor, \DateInterval $interval, array $type, Context $context)
+    {
+        $date = array_filter(array(
+            'Y' => $interval->y,
+            'M' => $interval->m,
+            'D' => $interval->d
+        ));
+
+        // Reading all non-zero time parts.
+        $time = array_filter(array(
+            'H' => $interval->h,
+            'M' => $interval->i,
+            'S' => $interval->s
+        ));
+
+        $specString = 'P';
+
+        // Adding each part to the spec-string.
+        foreach ($date as $key => $value) {
+            $specString .= $value . $key;
+        }
+        if (count($time) > 0) {
+            $specString .= 'T';
+            foreach ($time as $key => $value) {
+                $specString .= $value . $key;
+            }
+        }
+
+        return $visitor->visitSimpleString($specString, $type, $context);
     }
 
     public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
     {
-
         $v = $date->format('Y-m-d');
 
         return $visitor->visitSimpleString($v, $type, $context);
