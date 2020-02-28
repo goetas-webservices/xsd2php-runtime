@@ -77,6 +77,26 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
         $this->assertEquals($expected, $deserialized);
     }
 
+    /**
+     * @dataProvider getDeserializeDateInterval
+     * @param string    $dateInterval
+     * @param \DateTime $expected
+     */
+    public function testDeserializeDateInterval($dateInterval, $expected)
+    {
+        $element = new \SimpleXMLElement("<DateInterval>$dateInterval</DateInterval>");
+        $deserialized = $this->handler->deserializeDateIntervalXml($this->visitor, $element, [], $this->context);
+        $this->assertEquals($expected, $deserialized->f);
+    }
+
+    public function getDeserializeDateInterval()
+    {
+        return [
+            ['P0Y0M0DT3H5M7.520S', 0.52],
+            ['P0Y0M0DT3H5M7S', 0]
+        ];
+    }
+
     public function getDeserializeDate()
     {
         return [
