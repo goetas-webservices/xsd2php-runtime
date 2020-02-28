@@ -147,9 +147,9 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         return $datetime;
     }
 
-    private function createDateInterval(string $interval){
+    private function createDateInterval($interval){
         $f = 0.0;
-        if(preg_match('~\.\d+~',$interval,$match)){
+        if (preg_match('~\.\d+~',$interval,$match)) {
             $interval = str_replace($match[0], "", $interval);
             $f = (float)$match[0];
         }
