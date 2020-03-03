@@ -72,7 +72,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         if (isset($attributes['nil'][0]) && (string) $attributes['nil'][0] === 'true') {
             return null;
         }
-        return new \DateInterval((string)$data);
+        return $this->createDateInterval((string)$data);
     }
 
     public function serializeDate(XmlSerializationVisitor $visitor, \DateTime $date, array $type, Context $context)
@@ -145,6 +145,21 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
         }
 
         return $datetime;
+    }
+
+    private function createDateInterval($interval){
+        $f = 0.0;
+        if (preg_match('~\.\d+~',$interval,$match)) {
+            $interval = str_replace($match[0], "", $interval);
+            $f = (float)$match[0];
+        }
+        $di = new \DateInterval($interval);
+        // milliseconds are only available from >=7.1
+        if(isset($di->f)){
+            $di->f= $f;
+        }
+
+        return $di;
     }
 }
 
