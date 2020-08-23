@@ -14,8 +14,9 @@ use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\XmlDeserializationVisitor;
 use JMS\Serializer\XmlSerializationVisitor;
 use Metadata\MetadataFactory;
+use PHPUnit\Framework\TestCase;
 
-class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCase
+class XmlSchemaDateHandlerDeserializationTest extends TestCase
 {
     /**
      * @var XmlSchemaDateHandler
@@ -31,7 +32,7 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
      */
     protected $visitor;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->handler = new XmlSchemaDateHandler();
         $this->context = DeserializationContext::create();
@@ -110,11 +111,9 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
         ];
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testDeserializeInvalidDate()
     {
+        $this->expectException(\RuntimeException::class);
         $element = new \SimpleXMLElement("<Date>2015-01-01T</Date>");
         $this->handler->deserializeDate($this->visitor, $element, [], $this->context);
     }

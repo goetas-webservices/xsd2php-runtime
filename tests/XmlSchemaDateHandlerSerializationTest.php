@@ -13,8 +13,9 @@ use JMS\Serializer\Naming\IdenticalPropertyNamingStrategy;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\XmlSerializationVisitor;
 use Metadata\MetadataFactory;
+use PHPUnit\Framework\TestCase;
 
-class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
+class XmlSchemaDateHandlerSerializationTest extends TestCase
 {
     /**
      * @var XmlSchemaDateHandler
@@ -30,7 +31,7 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
      */
     protected $visitor;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->handler = new XmlSchemaDateHandler();
         $this->context = SerializationContext::create();
