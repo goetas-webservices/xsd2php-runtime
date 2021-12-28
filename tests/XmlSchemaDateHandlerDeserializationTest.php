@@ -95,4 +95,35 @@ class XmlSchemaDateHandlerDeserializationTest extends \PHPUnit_Framework_TestCas
         $element = new \SimpleXMLElement("<Date>2015-01-01T</Date>");
         $this->handler->deserializeDate($this->visitor, $element, [], $this->context);
     }
+
+    /**
+     * @dataProvider getDeserializeDateInterval
+     * @param string        $interval
+     * @param \DateInterval $expected
+     */
+    public function testDeserializeDateInterval(string $interval, \DateInterval $expected)
+    {
+        $element = new \SimpleXMLElement("<DateInterval>$interval</DateInterval>");
+        $deserialized = $this->handler->deserializeDateIntervalXml($this->visitor, $element, []);
+        $this->assertEquals($expected, $deserialized);
+    }
+
+    public function getDeserializeDateInterval()
+    {
+        $interval1 = new \DateInterval('PT1M23S');
+        $interval2 = new \DateInterval('P2DT3H');
+
+        $interval1Invert = clone $interval1;
+        $interval1Invert->invert = 1;
+
+        $interval2Invert = clone $interval2;
+        $interval2Invert->invert = 1;
+
+        return [
+            ['PT1M23S', $interval1],
+            ['-PT1M23S', $interval1Invert],
+            ['P2DT3H', $interval2],
+            ['-P2DT3H', $interval2Invert],
+        ];
+    }
 }

@@ -104,7 +104,7 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
             'S' => $interval->s
         ));
 
-        $specString = 'P';
+        $specString = ($interval->invert === 1) ? '-P' : 'P';
 
         // Adding each part to the spec-string.
         foreach ($date as $key => $value) {
