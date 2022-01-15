@@ -110,4 +110,36 @@ class XmlSchemaDateHandlerSerializationTest extends \PHPUnit_Framework_TestCase
             [new \DateTime('2015-01-01 12:00:56', new \DateTimeZone("Europe/London")), '2015-01-01'],
         ];
     }
+
+    /**
+     * @dataProvider getSerializeDateInterval
+     * @param \DateInterval $interval
+     * @param string        $expected
+     */
+    public function testSerializeDateInterval(\DateInterval $interval, string $expected)
+    {
+        $ret = $this->handler->serializeDateInterval($this->visitor, $interval, [], $this->context);
+
+        $actual = $ret ? $ret->nodeValue : $this->visitor->getCurrentNode()->nodeValue;
+        $this->assertEquals($expected, $actual);
+    }
+
+    public function getSerializeDateInterval()
+    {
+        $interval1 = new \DateInterval('PT1M23S');
+        $interval2 = new \DateInterval('P2DT3H');
+
+        $interval1Invert = clone $interval1;
+        $interval1Invert->invert = 1;
+
+        $interval2Invert = clone $interval2;
+        $interval2Invert->invert = 1;
+
+        return [
+            [$interval1, 'PT1M23S'],
+            [$interval1Invert, '-PT1M23S'],
+            [$interval2, 'P2DT3H'],
+            [$interval2Invert, '-P2DT3H'],
+        ];
+    }
 }
