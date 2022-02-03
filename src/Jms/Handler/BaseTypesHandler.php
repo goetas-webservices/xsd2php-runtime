@@ -10,6 +10,9 @@ use JMS\Serializer\XmlSerializationVisitor;
 class BaseTypesHandler implements SubscribingHandlerInterface
 {
 
+    /**
+     * @return array
+     */
     public static function getSubscribingMethods()
     {
         return array(
