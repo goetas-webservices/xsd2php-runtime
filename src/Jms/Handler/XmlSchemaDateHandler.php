@@ -13,6 +13,9 @@ class XmlSchemaDateHandler implements SubscribingHandlerInterface
 
     protected $defaultTimezone;
 
+    /**
+     * @return array
+     */
     public static function getSubscribingMethods()
     {
         return array(
